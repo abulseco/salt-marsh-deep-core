@@ -1,0 +1,697 @@
+# Geochemistry plots for deep core project
+# Data provided by Don Barber & Tom Mozdzer 
+# Code provided by J. Vineis & Maggi Brisbin
+
+# Load Libraries
+  library(ggplot2)
+  library(plyr)
+  library(ggExtra)
+  library(gridExtra)
+  library(nlme)
+  library(lme4)
+  library(psych)
+  library(lsr)
+  library(readr)
+  library(vegan)
+  library(patchwork)
+  library(agricolae)
+  library(Hmisc)
+  library(ggpubr)
+  library(car)
+  
+setwd("~/Dropbox/R/Deep_Core")
+
+# Bulk Density
+#-------------------------------------------------------------------------------
+
+# Load data
+bulk_LOI <- read.csv("deepcore_bd_LOI.csv", header = T)
+str(bulk_LOI)
+
+# Checking assumptions:
+
+
+BD_plot <- ggplot(bulk_LOI, aes(y = bulk_LOI$Bulk_Density, x = bulk_LOI$Depth, fill = bulk_LOI$Site)) + #, fill = phy_meta_f_table$Habitat
+  #geom_point(aes(shape = bulk_LOI$Core, color = bulk_LOI$Site))+
+  # geom_smooth(colour="black") +
+  geom_line(aes(color = bulk_LOI$Site)) +
+  scale_fill_manual(values = c("#7fbc41","#2171b5")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  scale_y_continuous(name="Bulk Density",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.background = element_blank(),
+        panel.border = element_rect(fill=NA),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+#BD_plot <- BD_plot + ggtitle("(A)")
+BD_plot
+
+LOI_plot <- ggplot(bulk_LOI, aes(y = bulk_LOI$LOI, x = bulk_LOI$Depth, fill = bulk_LOI$Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_point(aes(shape = bulk_LOI$Core, color = bulk_LOI$Site))+
+  geom_smooth(colour="black") +
+  #geom_line(aes(color = bulk_LOI$Site)) +
+  scale_fill_manual(values = c("#7fbc41","#2171b5")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  scale_y_continuous(name="Loss-on-Ignition",position = "right") +
+  xlab(NULL) +
+  coord_flip() +
+  scale_x_reverse() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+#LOI_plot <- LOI_plot + ggtitle("(B)")
+LOI_plot
+
+BD_plot + LOI_plot
+
+# Then %C, %N, and Molar C:N
+deep_all_geochem <- read.csv("~/R/Deep_Core/deepcore_geochem_ALL.csv")
+str(deep_all_geochem)
+
+Perc_N_plot <- ggplot(deep_all_geochem, aes(y = deep_all_geochem$Perc_N, x = deep_all_geochem$Depth, fill = deep_all_geochem$Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_point(aes(shape = deep_all_geochem$CoreID, color = deep_all_geochem$Site))+
+  geom_smooth(colour="black") +
+  #geom_line(aes(color = deep_all_geochem$Site)) +
+  scale_fill_manual(values = c("#7fbc41","#2171b5")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  scale_y_continuous(name="% Nitrogen",position = "right") +
+  xlab(NULL) +
+  coord_flip() +
+  scale_x_reverse() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+#Perc_N_plot <- Perc_N_plot + ggtitle("(C)")
+Perc_N_plot
+
+Perc_C_plot <- ggplot(deep_all_geochem, aes(y = deep_all_geochem$Perc_C, x = deep_all_geochem$Depth, fill = deep_all_geochem$Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_point(aes(shape = deep_all_geochem$CoreID, color = deep_all_geochem$Site))+
+  geom_smooth(colour="black") +
+  #geom_line(aes(color = deep_all_geochem$Site)) +
+  scale_fill_manual(values = c("#7fbc41","#2171b5")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  scale_y_continuous(name="% Carbon",position = "right") +
+  xlab("Depth (cm") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+#Perc_C_plot <- Perc_C_plot + ggtitle("(D)")
+Perc_C_plot
+
+CN_mod <- lm(Perc_C~Site+Depth + (1|CoreRep), data = deep_all_geochem)
+summary(CN_mod)
+plot(CN_mod)
+
+
+library(lme4)
+
+library(car)
+
+mod1 <- lm(Perc_C ~ Site + (1|CoreRep) + (1|Depth), data = deep_all_geochem)
+mod2 <- lm(Perc_N ~ Site + (1|CoreRep) + (1|Depth), data = deep_all_geochem)
+
+mod3 <- lm(CN ~ Site + (1/CoreRep) + (1/Depth), data = deep_all_geochem)
+
+summary(mod1)
+summary(mod2)
+summary(mod3)
+
+
+str(deep_all_geochem)
+deep_all_geochem$Depth <- as.factor(deep_all_geochem$Depth)
+
+deep
+#=============================================================================================
+# Linear Mixed Models to examine organic matter parameters:
+
+# Percent Carbon ------------------------------------
+test <-  lmer(Perc_C ~ Site + Depth + (1|CoreID), data = deep_all_geochem, REML = FALSE)
+red_test1 <- lmer(Perc_C ~ Site + (1|CoreID), data = deep_all_geochem, REML = FALSE)
+red_test2 <- lmer(Perc_C ~ Site + (1|Depth) + (1|CoreID), data = deep_all_geochem, REML = FALSE)
+summary(test)
+summary(red_test1) #p-value is from log ratio test of full and reduced model 
+summary(red_test2)
+
+Anova(test)
+
+# Percent Nitrogen ----------------------------------
+test <-  lmer(CN~ Site + Depth + (1|CoreID), data = deep_all_geochem, REML = FALSE)
+red_test1 <- lmer(Perc_N ~ Site + (1|CoreID), data = deep_all_geochem, REML = FALSE)
+red_test2 <- lmer(Perc_N ~ Site + (1|Depth) + (1|CoreID), data = deep_all_geochem, REML = FALSE)
+summary(test)
+summary(red_test1) #p-value is from log ratio test of full and reduced model 
+summary(red_test2)
+
+length(deep_all_geochem)
+print(deep_all_geochem)
+hist(deep_all_geochem$Perc_C)
+str(deep_all_geochem)
+
+summary(test)
+anova(test)
+
+
+test <- lm(Shannon~Depth+Perc_C+Perc_N, data = alpha_deep_DNA) 
+
+# keeping core and site as as the random effects? (I don't think I care about site here, and may not above either, it depends how I'm framing it). 
+summary(test)
+anova(test)
+Anova(test)
+
+
+
+
+#===========================================================================================
+summary(f1)
+Anova(f1)
+histogram(deep_all_geochem$Perc_C)
+mixed.lmer <- lmer(Perc_C ~ Site + Depth + (1|CoreRep), data = deep_all_geochem)
+summary(mixed.lmer)
+
+CN_plot <- ggplot(deep_all_geochem, aes(y = deep_all_geochem$CN, x = deep_all_geochem$Depth, fill = deep_all_geochem$Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_point(aes(shape = deep_all_geochem$CoreID, color = deep_all_geochem$Site))+
+  geom_smooth(colour="black") +
+  #geom_line(aes(color = deep_all_geochem$Site)) +
+  scale_fill_manual(values = c("#7fbc41","#2171b5")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  scale_y_continuous(name="Molar C:N",position = "right") +
+  xlab(NULL) +
+  coord_flip() +
+  scale_x_reverse() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+#CN_plot <- CN_plot + ggtitle("(E)")
+CN_plot
+
+IndexII_plot <- ggplot(deep_all_geochem, aes(y = deep_all_geochem$IndexII, x = deep_all_geochem$Depth, fill = deep_all_geochem$Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_point(aes(shape = deep_all_geochem$CoreID, color = deep_all_geochem$Site))+
+  geom_smooth(colour="black") +
+  #geom_line(aes(color = deep_all_geochem$Site)) +
+  scale_fill_manual(values = c("#7fbc41","#2171b5")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  scale_y_continuous(name="Index II",position = "right") +
+  xlab(NULL) +
+  coord_flip() +
+  scale_x_reverse() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+#IndexII_plot <- IndexII_plot + ggtitle("(F)")
+IndexII_plot
+
+BD_plot + LOI_plot + Perc_N_plot + Perc_C_plot + CN_plot + IndexII_plot + plot_layout(nrow = 2)
+
+# Trying to run a PCA on the organic matter quality
+#--------------------------------------------------
+# (Didn't work very well lol)
+deep_geochem <- read.csv("deepcore_geochem_PCA.csv")
+
+library(ape)
+pca_mod <- princomp(deep_geochem[,7:10], cor = FALSE)
+plot(pca_mod$scores, pch = 16, col = deep_geochem$DepthCat)
+legend(-15,6,c("Shallow","Mid","Deep"),pch=16)
+dev.off()
+
+screeplot(pca_mod, type = 'lines')
+biplot(pca_mod)
+
+dist_geochem <- as.dist(as(deep_geochem[,7:10], "matrix"))
+dist_pca <- pcoa(dist_geochem)
+
+my.rda <- rda(deep_geochem[,7:10])
+biplot(my.rda)
+biplot(my.rda,
+       display = c("sites", 
+                   "species"),
+       type = c("text",
+                "points"))
+ordihull(my.rda, group = deep_geochem$Site)
+dev.off()
+
+#------
+deep_geochem <- read.csv("deepcore_geochem_ALL.csv")
+
+deep_geochem <- read.csv("~/R/Deep_Core/deepcore_geochem_ALL.csv")
+soil.dist <- as.dist(as(deep_geochem[,7:10], "matrix"))
+
+bacteria <- read.csv("~/R/Deep_Core/asv_deepcore_L6.csv")
+bacteria.dist <- as.dist(bacteria, "matrix")
+
+mantel(soil.dist, bacteria.dist, method = "pearson", permutations=9999)
+#------
+
+#Tests to see if OM changes with depth:
+library(lme4)
+
+mod1 <- lm(Perc_C~Depth+(Site/CoreID), data = deep_all_geochem)
+mod2 <- lm(Perc_C~Depth*(Site/CoreID), data = deep_all_geochem)
+summary(mod1)
+summary(mod2)
+
+
+
+mod <- lmer(Perc_C~Depth+Site + (1|CoreID), data = deep_all_geochem)
+summary(mod)
+Anova(mod)
+
+# -------------------------------------------------
+# Correlations among other parameters along depth: 
+geochem_all <- read.csv("organic_matter_all_only.csv", header = T)
+
+# Testing assumptions for correlation:
+# normality
+shapiro.test(geochem_all$BD) # Not normal
+shapiro.test(geochem_all$LOI) # normal
+shapiro.test(geochem_all$Perc_C) # normal
+shapiro.test(geochem_all$Perc_N) # normal
+shapiro.test(geochem_all$CN) # normal
+shapiro.test(geochem_all$IndexI) # not normal
+shapiro.test(geochem_all$IndexII) # not normal
+
+qqplot(geochem_all$BD)
+
+BDvPerc_C_plot <- ggplot(data = geochem_all, aes(x = BD, y = Perc_C, group = Site, colour = Site)) +
+  geom_point(aes(fill = for_color), colour = "black", size = 4, pch = 21) +
+  #geom_smooth(colour = "black") +
+  xlab("Bulk Density") +
+  ylab("Percent Carbon") +
+  scale_fill_manual(values=c("#9ecae1","#4292c6","#2171b5","#08519c","#08306b",
+                             "#c7e9c0","#74c476","#41ab5d","#238b45","#005a32")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  theme_bw() + theme(axis.text.x=element_text(size = 14, color="black"),
+                    axis.text.y=element_text(size = 14, color="black"),
+                    panel.grid.major = element_blank(),
+                    panel.grid.minor = element_blank(),
+                    text=element_text(size=20),
+                    panel.border = element_rect(colour = "black", fill=NA),
+                    panel.background = element_blank(),
+                    axis.line = element_line(colour = "black"), 
+                    legend.position = "none")
+
+BDvPerc_C_plot
+
+cor.test(geochem_all$BD, geochem_all$Perc_C, method = "spearman")
+
+Perc_NvPerc_C_plot <- ggplot(data = geochem_all, aes(x = Perc_N, y = Perc_C, group = Site, colour = Site)) +
+  geom_point(aes(fill = for_color), colour = "black", size = 4, pch = 21) +
+  #geom_smooth(colour = "black") +
+  xlab("Percent Nitrogen") +
+  ylab("Percent Carbon") +
+  scale_fill_manual(values=c("#9ecae1","#4292c6","#2171b5","#08519c","#08306b",
+                             "#c7e9c0","#74c476","#41ab5d","#238b45","#005a32")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  theme_bw() + 
+  theme(axis.text.x=element_text(size = 14, color="black"),
+                    axis.text.y=element_text(size = 14, color="black"),
+                    panel.grid.major = element_blank(),
+                    panel.grid.minor = element_blank(),
+                    text=element_text(size=20),
+                    panel.border = element_rect(colour = "black", fill=NA),
+                    panel.background = element_blank(),
+                    axis.line = element_line(colour = "black"), 
+                    legend.position = "none")
+Perc_NvPerc_C_plot
+
+cor.test(geochem_all$Perc_N, geochem_all$Perc_C, method = "pearson")
+
+LOIvPerc_C_plot <- ggplot(data = geochem_all, aes(x = LOI, y = Perc_C, group = Site, colour = Site)) +
+  geom_point(aes(fill = for_color), colour = "black", size = 4, pch = 21) +
+  #geom_smooth(colour = "black") +
+  xlab("Loss-on-Ignition") +
+  ylab("Percent Carbon") +
+  scale_fill_manual(values=c("#9ecae1","#4292c6","#2171b5","#08519c","#08306b",
+                             "#c7e9c0","#74c476","#41ab5d","#238b45","#005a32")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(colour = "black", fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+LOIvPerc_C_plot
+
+cor.test(geochem_all$LOI, geochem_all$Perc_C, method = "pearson")
+
+BDvCN_plot <- ggplot(data = geochem_all, aes(x = BD, y = CN, group = Site, colour = Site)) +
+  geom_point(aes(fill = for_color), colour = "black", size = 4, pch = 21) +
+  #geom_smooth(colour = "black") +
+  xlab("Bulk Density") +
+  ylab("C:N Ratio") +
+  scale_fill_manual(values=c("#9ecae1","#4292c6","#2171b5","#08519c","#08306b",
+                             "#c7e9c0","#74c476","#41ab5d","#238b45","#005a32")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(colour = "black", fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+BDvCN_plot
+
+cor.test(geochem_all$BD, geochem_all$CN, method = "spearman")
+
+LOIvCN_plot <- ggplot(data = geochem_all, aes(x = LOI, y = CN, group = Site, colour = Site)) +
+  geom_point(aes(fill = for_color), colour = "black", size = 4, pch = 21) +
+  #geom_smooth(colour = "black") +
+  xlab("Loss-on-Ignition") +
+  ylab("C:N Ratio") +
+  scale_fill_manual(values=c("#9ecae1","#4292c6","#2171b5","#08519c","#08306b",
+                             "#c7e9c0","#74c476","#41ab5d","#238b45","#005a32")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(colour = "black", fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+LOIvCN_plot
+
+cor.test(geochem_all$LOI, geochem_all$CN, method = "pearson") 
+
+IndexIvCN_plot <- ggplot(data = geochem_all, aes(x = IndexI, y = CN, group = Site, colour = Site)) +
+  geom_point(aes(fill = for_color), colour = "black", size = 4, pch = 21) +
+  #geom_smooth(colour = "black") +
+  xlab("Index I") +
+  ylab("C:N Ratio") +
+  scale_fill_manual(values=c("#9ecae1","#4292c6","#2171b5","#08519c","#08306b",
+                             "#c7e9c0","#74c476","#41ab5d","#238b45","#005a32")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(colour = "black", fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+IndexIvCN_plot
+
+IndexIvC_plot <- ggplot(data = geochem_all, aes(x = IndexI, y = Perc_C, group = Site, colour = Site)) +
+  geom_point(aes(fill = for_color), colour = "black", size = 4, pch = 21) +
+  #geom_smooth(colour = "black") +
+  xlab("Index I") +
+  ylab("%C") +
+  scale_fill_manual(values=c("#9ecae1","#4292c6","#2171b5","#08519c","#08306b",
+                             "#c7e9c0","#74c476","#41ab5d","#238b45","#005a32")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(colour = "black", fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+IndexIvC_plot
+
+cor.test(geochem_all$IndexI, geochem_all$CN) 
+
+IndexIIvCN_plot <- ggplot(data = geochem_all, aes(x = IndexII, y = CN, group = Site, colour = Site)) +
+  geom_point(aes(fill = for_color), colour = "black", size = 4, pch = 21) +
+  #geom_smooth(colour = "black") +
+  xlab("Index II") +
+  ylab("C:N Ratio") +
+  scale_fill_manual(values=c("#9ecae1","#4292c6","#2171b5","#08519c","#08306b",
+                             "#c7e9c0","#74c476","#41ab5d","#238b45","#005a32")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(colour = "black", fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+IndexIIvCN_plot
+
+IndexIIvC_plot <- ggplot(data = geochem_all, aes(x = IndexII, y = Perc_C, group = Site, colour = Site)) +
+  geom_point(aes(fill = for_color), colour = "black", size = 4, pch = 21) +
+  #geom_smooth(colour = "black") +
+  xlab("Index II") +
+  ylab("%C") +
+  scale_fill_manual(values=c("#9ecae1","#4292c6","#2171b5","#08519c","#08306b",
+                             "#c7e9c0","#74c476","#41ab5d","#238b45","#005a32")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(colour = "black", fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+IndexIIvC_plot
+
+IndexIvDepth <- ggplot(data = geochem_all, aes(x = Depth, y = IndexI, group = Site, colour = Site)) +
+  geom_point(aes(fill = for_color), colour = "black", size = 4, pch = 21) +
+  #geom_smooth(colour = "black") +
+  xlab("Depth") +
+  ylab("Index I") +
+  scale_fill_manual(values=c("#9ecae1","#4292c6","#2171b5","#08519c","#08306b",
+                             "#c7e9c0","#74c476","#41ab5d","#238b45","#005a32")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(colour = "black", fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+IndexIvDepth
+
+IndexIIvDepth <- ggplot(data = geochem_all, aes(x = Depth, y = IndexII, group = Site, colour = Site)) +
+  geom_point(aes(fill = for_color), colour = "black", size = 4, pch = 21) +
+  #geom_smooth(colour = "black") +
+  xlab("Depth") +
+  ylab("Index II") +
+  scale_fill_manual(values=c("#9ecae1","#4292c6","#2171b5","#08519c","#08306b",
+                             "#c7e9c0","#74c476","#41ab5d","#238b45","#005a32")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(colour = "black", fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+IndexIIvDepth
+
+cor.test(geochem_all$Depth, geochem_all$IndexI) 
+cor.test(geochem_all$Depth, geochem_all$IndexII) 
+IndexIvDepth + IndexIIvDepth + plot_layout(ncol = 2)
+
+cor.test(geochem_all$IndexII, geochem_all$Perc_C) 
+
+str(geochem_all)
+BDvPerc_C_plot + Perc_NvPerc_C_plot + LOIvPerc_C_plot + BDvCN_plot + LOIvCN_plot + IndexIvCN_plot + IndexIvC_plot + IndexIIvCN_plot + IndexIIvC_plot + plot_layout(ncol=3)
+
+# Exploratory qpcr data against organic matter characteristics
+qpcr_ratio <- read.csv("qpcr_ratio.csv", header = T)
+
+plot(ratio_of_log~BD, data = qpcr_ratio)
+plot(ratio_of_log~LOI, data = qpcr_ratio)
+plot(ratio_of_log~Perc_N, data = qpcr_ratio)
+plot(ratio_of_log~Perc_C, data = qpcr_ratio)
+plot(ratio_of_log~CN, data = qpcr_ratio)
+plot(ratio_of_log~IndexI, data = qpcr_ratio)
+plot(ratio_of_log~IndexII, data = qpcr_ratio)
+
+qpcr_ratio_vs_CN_plot <- ggplot(data = qpcr_ratio, aes(x = CN, y = ratio_of_log, colour = Site)) +
+  geom_point(aes(fill = for_color), colour = "black", size = 4, pch = 21) +
+  #geom_smooth(colour = "black", method = "lm") +
+  xlab("C:N Ratio") +
+  ylab("16S rRNA:16S rRNA \n gene abundance") +
+  scale_fill_manual(values=c("#9ecae1","#4292c6","#2171b5","#08519c","#08306b",
+                             "#c7e9c0","#74c476","#41ab5d","#238b45","#005a32")) +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(colour = "black", fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+qpcr_ratio_vs_CN_plot
+
+qpcr_ratio_vs_PerC_plot <- ggplot(data = qpcr_ratio, aes(x = Perc_C, y = ratio_of_log, colour = Site)) +
+  geom_point(aes(fill = for_color), colour = "black", size = 4, pch = 21) +
+  #geom_smooth(colour = "black", method = "lm") +
+  xlab("Percent Carbon") +
+  ylab("16S rRNA:16S rRNA \n gene abundance") +
+  scale_fill_manual(values=c("#9ecae1","#4292c6","#2171b5","#08519c","#08306b",
+                             "#c7e9c0","#74c476","#41ab5d","#238b45","#005a32")) +
+  
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(colour = "black", fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+qpcr_ratio_vs_PerC_plot
+
+qpcr_ratio_vs_CN_plot + qpcr_ratio_vs_PerC_plot + per.dorm_vs_per.N
+
+# Exploratory %Dormancy data against organic matter characteristics
+deepcore_dormancy <- read.csv("ash_dormy_mc_dorm_face.csv", header = TRUE)
+
+plot(per.dorm~BD, data = deepcore_dormancy)
+plot(per.dorm~LOI, data = deepcore_dormancy)
+plot(per.dorm~Perc_N, data = deepcore_dormancy)
+mod1 <- lm(per.dorm~Perc_N, data = deepcore_dormancy)
+summary(mod1)
+
+per.dorm_vs_per.N <- ggplot(data = deepcore_dormancy, aes(x = Perc_N, y = per.dorm, colour = Site)) +
+  geom_point(aes(fill = for_color), colour = "black", size = 4, pch = 21) +
+  #geom_smooth(colour = "black", method = "lm")  +
+  xlab("Percent Nitrogen") +
+  ylab("% Inactivity \n") +
+  scale_fill_manual(values=c("#9ecae1","#4292c6","#2171b5","#08519c","#08306b",
+                             "#c7e9c0","#74c476","#41ab5d","#238b45","#005a32")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(colour = "black", fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+per.dorm_vs_per.N
+
+per.dorm_vs_per.C <- ggplot(data = deepcore_dormancy, aes(x = Perc_C, y = per.dorm, colour = Site)) +
+  geom_point(aes(fill = for_color), colour = "black", size = 4, pch = 21) +
+  #geom_smooth(colour = "black", method = "lm")  +
+  xlab("Percent Carbon") +
+  ylab("% Inactivity \n") +
+  scale_fill_manual(values=c("#9ecae1","#4292c6","#2171b5","#08519c","#08306b",
+                             "#c7e9c0","#74c476","#41ab5d","#238b45","#005a32")) +
+  scale_color_manual(values = c("#7fbc41","#2171b5")) +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(colour = "black", fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none")
+per.dorm_vs_per.C
+
+per.dorm.N.mod <- lm(x = Perc_N~per.dorm, data = deepcore_dormancy)
+summary(per.dorm.N.mod)
+shapiro.test(deepcore_dormancy$per.dorm) # normal
+shapiro.test(deepcore_dormancy$Perc_N) # normal
+cor.test(deepcore_dormancy$per.dorm, deepcore_dormancy$Perc_N, method = "pearson") 
+cor.test(deepcore_dormancy$per.dorm, deepcore_dormancy$Perc_C, method = "spearman") 
+cor.test(deepcore_dormancy$per.dorm, deepcore_dormancy$CN, method = "pearson") 
+cor.test(deepcore_dormancy$per.dorm, deepcore_dormancy$BD, method = "spearman") 
+cor.test(deepcore_dormancy$per.dorm, deepcore_dormancy$LOI, method = "spearman") 
+cor.test(qpcr_ratio$ratio_of_log, qpcr_ratio$Perc_C, method = "pearson")
+cor.test(qpcr_ratio$ratio_of_log, qpcr_ratio$CN, method = "pearson")
+
+
+# SUbset this by site
+
+
+plot(per.dorm~Perc_C, data = deepcore_dormancy)
+plot(per.dorm~CN, data = deepcore_dormancy)
+plot(per.dorm~IndexI, data = deepcore_dormancy)
+plot(per.dorm~IndexII, data = deepcore_dormancy)
+plot(per.dorm~Depth, data = deepcore_dormancy)
+
+
+qpcr_ratio_mod <- lm(ratio_of_log~CN, data = qpcr_ratio)
+summary(qpcr_ratio_mod)
+
+# Checking assumptions:
+par(mfrow = c(2, 2))
+plot(qpcr_ratio_mod)
+plot(qpcr_ratio_mod,4)
+plot(qpcr_ratio_mod,5)
+
+qpcr_ratio_mod2 <- lm(ratio_of_log~Perc_C, data = qpcr_ratio)
+summary(qpcr_ratio_mod2)
+
+par(mfrow = c(1, 2))
+plot(qpcr_ratio_mod2)
+plot(qpcr_ratio_mod2,4)
+plot(qpcr_ratio_mod2,5)
+
+#--------------------------
+
+

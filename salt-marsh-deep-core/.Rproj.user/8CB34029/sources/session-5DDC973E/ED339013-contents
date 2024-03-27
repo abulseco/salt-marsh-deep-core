@@ -1,0 +1,477 @@
+# FT-IR Analysis
+# Updated code in 2024 by ANB
+# salt-marsh-deep-core-amplicon
+
+library(ggplot2)
+library(plyr) 
+
+# Import data
+ratio <- read.csv("deep_core_ratios.csv")
+ratio
+head(ratio) #To visualize the data
+
+# Load data
+bulk_LOI <- read.csv("deepcore_bd_LOI.csv", header = T)
+str(bulk_LOI)
+head(bulk_LOI)
+
+# For now working with these data
+BD_plot <- ggplot(bulk_LOI, aes(y = Bulk_Density, x = Depth, fill = Core)) + #, fill = phy_meta_f_table$Habitat
+  #geom_point(aes(shape = bulk_LOI$Core, color = bulk_LOI$Site))+
+  # geom_smooth(colour="black") +
+  geom_line(aes(color = Core)) +
+  geom_point(aes(color=Core)) +
+  scale_color_manual(values = paletteer_c("ggthemes::Blue-Green Sequential", 6)) +
+  # scale_color_manual(values = paletteer_c("ggthemes::Orange", 6)) +
+  scale_y_continuous(name="Bulk Density",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+       # panel.grid.major = element_blank(),
+       # panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.background = element_blank(),
+        panel.border = element_rect(fill=NA),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site)
+#BD_plot <- BD_plot + ggtitle("(A)")
+BD_plot
+
+LOI_plot <- ggplot(bulk_LOI, aes(y = LOI, x = Depth, fill = Core)) + #, fill = phy_meta_f_table$Habitat
+  #geom_point(aes(shape = bulk_LOI$Core, color = bulk_LOI$Site))+
+  # geom_smooth(colour="black") +
+  geom_line(aes(color = Core)) +
+  geom_point(aes(color=Core)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  # scale_color_manual(values = paletteer_c("ggthemes::Orange", 6)) +
+  scale_y_continuous(name="Loss-On-Ignition",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        # panel.grid.major = element_blank(),
+        # panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.background = element_blank(),
+        panel.border = element_rect(fill=NA),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+LOI_plot
+
+library(patchwork)
+BD_plot | LOI_plot
+
+# Then %C, %N, and Molar C:N
+deep_all_geochem <- read.csv("deepcore_geochem_ALL.csv")
+str(deep_all_geochem)
+
+Perc_N_plot <- ggplot(deep_all_geochem, aes(y = Perc_N, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line(aes(color = CoreID)) +
+  geom_point(aes(color=CoreID)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="% Nitrogen",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        # panel.grid.major = element_blank(),
+        # panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+Perc_N_plot
+
+Perc_C_plot <- ggplot(deep_all_geochem, aes(y = Perc_C, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line(aes(color = CoreID)) +
+  geom_point(aes(color=CoreID)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="% Carbon",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        # panel.grid.major = element_blank(),
+        # panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+Perc_C_plot
+
+CN_plot <- ggplot(deep_all_geochem, aes(y = CN, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line(aes(color = CoreID)) +
+  geom_point(aes(color=CoreID)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="C:N Ratio",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        # panel.grid.major = element_blank(),
+        # panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+CN_plot
+
+# Read in 13C data
+carbon13 <- read.csv("13C_deepcore.csv")
+head(carbon13)
+
+C13_plot <- ggplot(carbon13, aes(y = C13, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line() +
+  geom_point() +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="Del 13C",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        # panel.grid.major = element_blank(),
+        # panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+C13_plot
+
+# Read in FT-IR Data
+ftir_ratios <- read.csv("deep_core_ratios.csv")
+head(ftir_ratios)
+
+aroali_ratio_plot <- ggplot(ftir_ratios, aes(y = aroali_ratio, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line(aes(color = CoreID)) +
+  geom_point(aes(color=CoreID)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="Aromatic:Aliphatic C Ratio (FT-IR)",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        # panel.grid.major = element_blank(),
+        # panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+aroali_ratio_plot
+
+hydroxylaro_ratio_plot <- ggplot(ftir_ratios, aes(y = hydroxylaro_ratio, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line(aes(color = CoreID)) +
+  geom_point(aes(color=CoreID)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="Hydroxyl:Aromatic C Ratio (FT-IR)",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        # panel.grid.major = element_blank(),
+        # panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+hydroxylaro_ratio_plot
+
+polyaro_ratio_plot <- ggplot(ftir_ratios, aes(y = polyaro_ratio, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line(aes(color = CoreID)) +
+  geom_point(aes(color=CoreID)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="Polysaccharides:Aromatic C Ratio (FT-IR)",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        # panel.grid.major = element_blank(),
+        # panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+polyaro_ratio_plot
+
+hydroxylaro_ratio_plot <- ggplot(ftir_ratios, aes(y = hydroxylaro_ratio, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line(aes(color = CoreID)) +
+  geom_point(aes(color=CoreID)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="Hydroxyl:Aromatic C Ratio (FT-IR)",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        # panel.grid.major = element_blank(),
+        # panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+hydroxylaro_ratio_plot
+
+index1_plot <- ggplot(deep_all_geochem, aes(y = IndexI, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line(aes(color = CoreID)) +
+  geom_point(aes(color=CoreID)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="Index I (FT-IR)",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        # panel.grid.major = element_blank(),
+        # panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+index1_plot 
+
+index2_plot <- ggplot(deep_all_geochem, aes(y = IndexII, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line(aes(color = CoreID)) +
+  geom_point(aes(color=CoreID)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="Index II (FT-IR)",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        axis.text.y=element_text(size = 14, color="black"),
+        # panel.grid.major = element_blank(),
+        # panel.grid.minor = element_blank(),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+index2_plot
+
+# upload NMR data
+nmr_data <- read.csv("integrations_all.csv")
+head(nmr_data)
+
+paraffin_plot <- ggplot(nmr_data, aes(y = paraffin, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line(aes(color = CoreID)) +
+  geom_point(aes(color=CoreID)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="Paraffins (NMR)",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+paraffin_plot
+
+methoxy_plot <- ggplot(nmr_data, aes(y = methoxy, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line(aes(color = CoreID)) +
+  geom_point(aes(color=CoreID)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="Methoxy (NMR)",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+methoxy_plot
+
+carb_plot <- ggplot(nmr_data, aes(y = carbohydrate, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line(aes(color = CoreID)) +
+  geom_point(aes(color=CoreID)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="Carbohydrates (NMR)",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+carb_plot
+
+aroC_plot <- ggplot(nmr_data, aes(y = aromatic_C, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line(aes(color = CoreID)) +
+  geom_point(aes(color=CoreID)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="Aromatic C (NMR)",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+aroC_plot
+
+subaroC_plot <- ggplot(nmr_data, aes(y = sub_aromatic_C, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line(aes(color = CoreID)) +
+  geom_point(aes(color=CoreID)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="Sub-aromatic C (NMR)",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+subaroC_plot
+
+o_subaroC_plot <- ggplot(nmr_data, aes(y = O.sub_aromatic_C, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line(aes(color = CoreID)) +
+  geom_point(aes(color=CoreID)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="O-Sub-aromatic C (NMR)",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+o_subaroC_plot
+
+carboxyl_plot <- ggplot(nmr_data, aes(y = carboxyl, x = Depth, fill = Site)) + #, fill = phy_meta_f_table$Habitat
+  geom_line(aes(color = CoreID)) +
+  geom_point(aes(color=CoreID)) +
+  scale_color_viridis(discrete = T, option = "D") +
+  scale_y_continuous(name="Carboxyls (NMR)",position = "right") +
+  xlab("Depth (cm)") +
+  coord_flip() +
+  scale_x_reverse() +
+  theme_bw() +
+  theme(axis.text.x=element_text(size = 14, color="black"),
+        text=element_text(size=20),
+        panel.border = element_rect(fill=NA),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"), 
+        legend.position = "none") +
+  facet_wrap(~Site) 
+carboxyl_plot
+
+# Combine NMR plots
+nmr_plots <- (paraffin_plot | methoxy_plot ) / (carb_plot | aroC_plot ) / (subaroC_plot | o_subaroC_plot)
+nmr_plots
+
+# Trying the FT-IR Spectra plot
+# The code below is for the FTR2 manuscript
+ftr2_spectra_persite <- read.csv("FTR2_FTIR_meanspectra_persite.csv", header = T)
+
+ftr2_spectra_persite$Site <- as.character(ftr2_spectra_persite$Site)
+ftr2_spectra_persite$Site <- factor(ftr2_spectra_persite$Site, levels=unique(ftr2_spectra_persite$Site))
+ftr2_spectra_persite$Site  <- factor(ftr2_spectra_persite$Site, levels=c("Reference","13-year enriched","40-year enriched"))
+
+spectra_plot <- ggplot(ftr2_spectra_persite, ∂aes(Wavenumber, color = Site)) + 
+  geom_line(aes(y=Mean), linetype = 2) + 
+  geom_ribbon(aes(ymin=ymin, ymax=ymax, fill = Site), alpha=0.2) +
+  scale_fill_manual(values=c("#0072B2","#1b9e77","#d95f02")) +
+  scale_color_manual(values = c("#0072B2","#1b9e77","#d95f02")) +
+  scale_x_reverse() +
+  xlab("Wavenumber") +
+  ylab("Intensity") +
+  geom_vline(xintercept = 1650, color = "black", linetype = 2) +
+  geom_vline(xintercept = 1270, color = "black", linetype = 2) +
+  geom_vline(xintercept = 1080, color = "black", linetype = 2) +
+  geom_vline(xintercept = 1110, color = "black", linetype = 2) +
+  theme.ftr2() +
+  theme(
+    legend.position = c(.01, 0.99),
+    legend.justification = c("left", "top"),
+    legend.box.just = "left",
+    legend.margin = margin(6, 6, 6, 6)
+  ) # Adding a custom legend to this plot
+# spectra_plot <- spectra_plot + ggtitle("(A)") + theme(plot.title = element_text(size = 20))
+spectra_plot
+
+pdf("deepcore_geochemistry.pdf")
+BD_plot
+LOI_plot
+Perc_C_plot
+Perc_N_plot
+CN_plot
+C13_plot
+aroali_ratio_plot
+hydroxylaro_ratio_plot
+polyaro_ratio_plot
+index1_plot
+index2_plot
+paraffin_plot
+methoxy_plot
+carb_plot
+aroC_plot
+subaroC_plot
+o_subaroC_plot
+dev.off()
+
+all_geochem_plot <- (BD_plot | LOI_plot | Perc_C_plot | Perc_N_plot | CN_plot)
+all_geochem_plot

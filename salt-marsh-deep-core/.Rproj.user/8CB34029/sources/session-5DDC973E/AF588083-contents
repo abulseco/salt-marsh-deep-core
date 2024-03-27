@@ -1,0 +1,69 @@
+# Script to FTIR PCA analyses
+# Updated by: AB<
+# Updated on: 7/20/16
+
+#########################
+
+# Upload data
+FTIRdata <- read.csv("deep_core.csv", header = T)
+head(FTIRdata [1:2])
+structure(FTIRdata)
+# Load packages
+library("FactoMineR")
+library("factoextra")
+library("ggplot2")
+
+# Understanding the data
+# Active individuals rows 1-28
+# Active variables columns 6-3001, variables used for the PCA
+# Supplementary qualitative variables columns 1-5
+
+# Correlation matrix
+cor.mat <- round(cor(FTIRdata))
+head(cor.mat[,1"6"])
+
+structure(FTIRdata)
+sapply(FTIRdata)
+
+# install.packages("devtools")
+devtools::install_github("kassambara/factoextra")
+# load
+library("factoextra")
+
+#Extracting Useful Data
+ratio_data_active <- FTIRdata[2:, 1:10]
+res.pca <- prcomp(FTIRdata, scale = TRUE)
+
+# Using vegan:
+library(vegan)
+ftir <- read.csv("deep_core_subset2.csv")
+rownames(ftir) <- ftir[,1]
+ftir<-ftir[-1,-1]
+pca<-rda(ftir)
+plot(pca, display="sites", type="text")
+ftir
+
+ftir_td1 <- read.csv("FTIR_data_Master.csv")
+str(ftir_td1)
+rownames(ftir_td1) <- ftir_td1[,1]
+ftir_td1.pca <- rda(ftir_td1[,1:2994], scale= T)
+plot(ftir_td1.pca)
+points(ftir_td1.pca, display = "sites")
+ordiellipse(ftir.pca, ftir_td1$label, kind ="se", conf = 0.95, lwd = 1, draw = "polygon", col ="skyblue", border  = "blue", label = T, cex = 1)
+
+
+str(ftir_td1)
+
+#WHile doing the vegan tutorial:https://www.youtube.com/watch?v=i3Kl8fOitaQ
+ftir_deep <- ftir <- read.csv("deep_core_subset2.csv") 
+rownames(ftir_deep) <- ftir_deep[,1]
+ftir.pca <- rda(ftir_deep[,4:2995], scale = T)
+ftir.pca
+scores(ftir.pca, choices = 1:2, display ="species", scaling = 0)
+plot(ftir.pca)
+
+#want to build up the plots step by step
+scl = 0
+plot(ftir.pca)
+points(ftir.pca, display = "sites")
+ordiellipse(ftir.pca, ftir_deep$depth, kind ="se", conf = 0.95, lwd = 1, draw = "polygon", col ="skyblue", border  = "blue", label = T, cex = 1)

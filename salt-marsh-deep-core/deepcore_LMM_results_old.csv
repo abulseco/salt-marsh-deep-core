@@ -1,0 +1,51 @@
+DNA Shallow,Model,df,dAICc,weight,,By site at the deeper depths,,,DNA West,Model,df,dAICc,weight
+logLik(mod1),1,3,27.4,<0.001,,,,,logLik(mod1),1,3,0,0.3611
+logLik(mod2),2,4,0,0.315,,,,,logLik(mod2),2,4,1.7,0.153
+logLik(mod3),3,4,29.3,<0.001,,,,,logLik(mod3),3,4,2.6,0.0994
+logLik(mod4),4,4,28.8,<0.001,,,,,logLik(mod4),4,4,2.2,0.1176
+logLik(mod5),5,4,29.6,<0.001,,,,,logLik(mod5),5,4,2.7,0.0934
+logLik(mod6),6,5,1.3,0.164,,,,,logLik(mod6),6,5,4.1,0.0469
+logLik(mod7),7,5,0,0.321,,,,,logLik(mod7),7,5,3.6,0.0589
+logLik(mod8),8,5,2.7,0.084,,,,,logLik(mod8),8,5,3.8,0.0529
+logLik(mod9),9,6,2.5,0.092,,,,,logLik(mod9),9,6,6.9,0.0116
+logLik(mod10),10,7,5.3,0.023,,,,,logLik(mod10),10,7,8.5,0.0051
+,,,,,,,,,,,,,
+,,,,,,,,,DNA SW,Model,df,dAICc,weight
+DNA Deep,Model,df,dAICc,weight,,,,,logLik(mod1),1,3,0,0.3701
+logLik(mod1),1,3,0,0.3269,,,,,logLik(mod2),2,4,2.6,0.103
+logLik(mod2),2,4,1.9,0.1255,,,,,logLik(mod3),3,4,2,0.1383
+logLik(mod3),3,4,2,0.1183,,,,,logLik(mod4),4,4,1.7,0.1611
+logLik(mod4),4,4,1.6,0.1473,,,,,logLik(mod5),5,4,2.5,0.1075
+logLik(mod5),5,4,2.2,0.1094,,,,,logLik(mod6),6,5,4.6,0.0365
+logLik(mod6),6,5,3.8,0.0478,,,,,logLik(mod7),7,5,4.3,0.0424
+logLik(mod7),7,5,3.3,0.0614,,,,,logLik(mod8),8,5,5.2,0.0276
+logLik(mod8),8,5,4.3,0.0389,,,,,logLik(mod9),9,6,7.3,0.0098
+logLik(mod9),9,6,5.7,0.0192,,,,,logLik(mod10),10,7,9.1,0.0038
+logLik(mod10),10,7,8.2,0.0054,,,,,,,,,
+,,,,,,,,,RNA WE,Model,df,dAICc,weight
+,,,,,,,,,logLik(mod1),1,3,0,0.3149
+,,,,,,,,,logLik(mod2),2,4,1,0.1904
+RNA Shallow,Model,df,dAICc,weight,,,,,logLik(mod3),3,4,2.6,0.0876
+logLik(mod1),1,3,48.6,<0.001,,,,,logLik(mod4),4,4,2.5,0.0924
+logLik(mod2),2,4,3.1,0.099,,,,,logLik(mod5),5,4,2.8,0.0774
+logLik(mod3),3,4,48.8,<0.001,,,,,logLik(mod6),6,5,2.9,0.0727
+logLik(mod4),4,4,49.9,<0.001,,,,,logLik(mod7),7,5,2.9,0.0743
+logLik(mod5),5,4,45.5,<0.001,,,,,logLik(mod8),8,5,2.9,0.0739
+logLik(mod6),6,5,0,0.458,,,,,logLik(mod9),9,6,6.4,0.013
+logLik(mod7),7,5,2,0.167,,,,,logLik(mod10),10,7,9.1,0.0034
+logLik(mod8),8,5,3,0.102,,,,,,,,,
+logLik(mod9),9,6,2.4,0.141,,,,,RNA SW,Model,df,dAICc,weight
+logLik(mod10),10,7,5.3,0.033,,,,,logLik(mod1),1,3,1.2,0.222
+,,,,,,,,,logLik(mod2),2,4,3.8,0.06
+,,,,,,,,,logLik(mod3),3,4,2.9,0.095
+RNA Deep,Model,df,dAICc,weight,,,,,logLik(mod4),4,4,3.6,0.067
+logLik(mod1),1,3,0,0.2788,,,,,logLik(mod5),5,4,0,0.397
+logLik(mod2),2,4,2.2,0.0916,,,,,logLik(mod6),6,5,5.7,0.023
+logLik(mod3),3,4,1,0.1712,,,,,logLik(mod7),7,5,6.4,0.016
+logLik(mod4),4,4,1.5,0.1326,,,,,logLik(mod8),8,5,2.8,0.099
+logLik(mod5),5,4,1.3,0.1473,,,,,logLik(mod9),9,6,7.6,0.009
+logLik(mod6),6,5,3.1,0.0592,,,,,logLik(mod10),10,7,7.1,0.011
+logLik(mod7),7,5,3.7,0.044,,,,,,,,,
+logLik(mod8),8,5,3.4,0.0515,,,,,,,,,
+logLik(mod9),9,6,5.4,0.0186,,,,,,,,,
+logLik(mod10),10,7,8,0.0052,,,,,,,,,
